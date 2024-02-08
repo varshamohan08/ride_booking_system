@@ -1,0 +1,139 @@
+backend running on port 8000
+USER MODULE
+
+http://localhost:8000/login
+
+post - for login
+eg json:
+{
+    "username" : "admin",
+    "password" : "test@123"
+}
+
+put - for customer sign in
+eg json:
+{
+    "username" : "cust4",
+    "name":"Customer4",
+    "email":"cust4@test.com",
+    "password" : "test@123"
+}
+
+http://localhost:8000/user_api
+only admin user have the permission for this class
+
+post – to create user
+eg json 1:
+{
+    "username" : "cust5",
+    "name" : "customer 5",
+    "email" : "cust5@test.com",
+    "password" : "test@123",
+    "user_type" : "Customer"
+}
+eg json 3:
+{
+    "username" : "admin1",
+    "name" : "admin",
+    "email" : "admin1@test.com",
+    "password" : "admin1@123",
+    "user_type" : "Admin"
+}
+eg json 3:
+{
+    "username" : "driver2",
+    "name" : "driver2",
+    "email" : "driver2@test.com",
+    "password" : "test@123",
+    "user_type" : "Driver"
+}
+user type is explicitely mentioned as admin can create any typeof user (admin, driver, customer) here
+
+put – to change password
+eg json:
+{
+    "current_password" : "admin1@123",
+    "new_password" : "test@123"
+}
+
+http://localhost:8000/share_location
+
+post – to create user
+eg json:
+{
+    "available" : true,
+    "location" : {"latitude" : 9.585872496805377, "longitude" : 76.63142218802217}
+}
+
+http://localhost:8000/share_location
+
+post – to create user
+for drivers to share location and update their availability
+eg json:
+{
+    "available" : true,
+    "location" : {"latitude" : 9.585872496805377, "longitude" : 76.63142218802217}
+}
+
+RIDE MODULE
+
+http://localhost:8000/ride/request_ride
+
+post – to show all the rides near with the distance, time and amount
+eg json:
+{
+    "pickup_location" : {"latitude" : 9.581331590728096, "longitude" : 76.63346969672654},
+    "dropoff_location" : {"latitude" : 10.301818563381353, "longitude" : 76.3329825120758}
+}
+
+    • time and distance are calculated by the pickup location and the location driver shared as updated his availability
+    • amount is calculated round(fare + (cost_per_km * distance) + (cost_per_min* total_minutes))
+        ◦ distance and total_minutes found from pickup_location and dropoff_location
+
+http://localhost:8000/ride/request_ride
+
+get – to show all the rides that has been created
+admin can see all rides
+customer can see the rides he/she created
+driver can see all rides that has been requested to him
+
+post – to create ride after /ride/request_ride 
+eg json:
+{
+    "driver_id": 6,
+    "pickup_location" : {"latitude" : 9.581331590728096, "longitude" : 76.63346969672654},
+    "dropoff_location" : {"latitude" : 10.301818563381353, "longitude" : 76.3329825120758},
+    "amount": 120.0
+}
+here status of the ride is set to Requested
+
+post – to update status of the ride 
+eg json 1:
+{
+    "id": 1,
+    "status" : "Accept"
+}
+eg json 2:
+{
+    "id": 1,
+    "status" : "Start"
+}
+eg json 1:
+{
+    "id": 1,
+    "status" : "Completed"
+}
+eg json 1:
+{
+    "id": 1,
+    "status" : "Cancel"
+}
+
+
+
+
+
+
+
+
+
