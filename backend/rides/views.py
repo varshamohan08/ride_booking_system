@@ -5,12 +5,14 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rides.serializers import RideSerializer
 from user_app.models import UserDetails, vehicle_type
+from user_app.serializers import UserDetailsSerializer
 from .models import Ride, RideStatus
 from django.core.exceptions import PermissionDenied
 
 from geopy.distance import geodesic
 from datetime import datetime
 from ast import literal_eval
+from rest_framework.pagination import PageNumberPagination
 
 def calculate_distance_time(point1, point2, speed_kmph=20):
     
@@ -35,24 +37,34 @@ class requestRide(APIView):
 
     def post(self, request):
         try:
+            # import pdb;pdb.set_trace()
             pickup_location = request.data.get('pickup_location')
             dropoff_location = request.data.get('dropoff_location')
-            drivers = UserDetails.objects.filter(user_type = 'Driver', available = True).values('name', 'location', 'vehicle_type')
+            drivers = UserDetails.objects.filter(user_type = 'Driver', available = True).values()
             vehicle_types = vehicle_type.objects.values()
 
             vehicle_dict = {}
+            
+            point1 = (pickup_location['lat'], pickup_location['lon'])
+            point2 = (dropoff_location['lat'], dropoff_location['lon'])
+            dropoff_distance, dropoff_hours, dropoff_minutes, dropoff_seconds = calculate_distance_time(point1, point2)
+
+            dropoff_time_taken = f"{dropoff_hours}h {dropoff_minutes}min {dropoff_seconds}sec"
+
+            dropoff_total_minutes = dropoff_hours * 60 + dropoff_minutes + dropoff_seconds / 60
 
             for each_vehicle_type in vehicle_types:
-                drivers = UserDetails.objects.filter(user_type = 'Driver', vehicle_type_id = each_vehicle_type["id"], available = True).values('user', 'name', 'location', 'vehicle_type')
 
-                for each_driver in drivers:
+                user_instance = UserDetails.objects.filter(user_type = 'Driver', vehicle_type_id = each_vehicle_type["id"], available = True)
+                drivers = UserDetailsSerializer(user_instance, many=True)
+
+                for each_driver in drivers.data:
 
                     location_dict = literal_eval(each_driver['location'])
 
-                    point1 = (location_dict['latitude'], location_dict['longitude'])
-                    point2 = (pickup_location['latitude'], pickup_location['longitude'])
+                    point3 = (location_dict['latitude'], location_dict['longitude'])
 
-                    distance, hours, minutes, seconds = calculate_distance_time(point1, point2)
+                    distance, hours, minutes, seconds = calculate_distance_time(point3, point1)
 
                     time_taken = f"{hours}h {minutes}min {seconds}sec"
 
@@ -60,7 +72,7 @@ class requestRide(APIView):
 
                     if each_vehicle_type['id'] in vehicle_dict.keys() and vehicle_dict[each_vehicle_type['id']]['distance'] > distance:
 
-                        amount = round(each_vehicle_type['fare'] + (each_vehicle_type['cost_per_km'] * distance) + (each_vehicle_type['cost_per_min'] * total_minutes))
+                        amount = round(each_vehicle_type['fare'] + (each_vehicle_type['cost_per_km'] * dropoff_distance) + (each_vehicle_type['cost_per_km'] * distance) + (each_vehicle_type['cost_per_min'] * total_minutes + (each_vehicle_type['cost_per_min'] * dropoff_total_minutes)))
                         if amount < each_vehicle_type['min_fare']:
                             amount = each_vehicle_type['min_fare']
 
@@ -70,12 +82,13 @@ class requestRide(APIView):
                             'time' : time_taken,
                             'type' : each_vehicle_type['type'],
                             'driver' : each_driver['user'],
-                            'amount' :amount
+                            'amount' :amount,
+                            'location' : eval(each_driver['location'])
                         }
                         
                     else:
 
-                        amount = round(each_vehicle_type['fare'] + (each_vehicle_type['cost_per_km'] * distance) + (each_vehicle_type['cost_per_min'] * total_minutes))
+                        amount = round(each_vehicle_type['fare'] + (each_vehicle_type['cost_per_km'] * dropoff_distance) + (each_vehicle_type['cost_per_km'] * distance) + (each_vehicle_type['cost_per_min'] * total_minutes + (each_vehicle_type['cost_per_min'] * dropoff_total_minutes)))
                         if amount < each_vehicle_type['min_fare']:
                             amount = each_vehicle_type['min_fare']
 
@@ -85,12 +98,19 @@ class requestRide(APIView):
                             'time' : time_taken,
                             'type' : each_vehicle_type['type'],
                             'driver' : each_driver['user'],
-                            'amount' :amount
+                            'amount' :amount,
+                            'location' : eval(each_driver['location'])
                         }
 
-            return Response(vehicle_dict, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "Success", "rides": vehicle_dict.values()}, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"detail": str(e)}, status=status.HTTP_403_FORBIDDEN)
+
+
+class RidesPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
 
 class rideAPI(APIView):
     permission_classes = [IsAuthenticated]
@@ -104,45 +124,58 @@ class rideAPI(APIView):
             else:
                 user_details = UserDetails.objects.get(user=request.user)
                 if user_details.user_type == 'Admin':
-                    rides = Ride.objects.all()
+                    rides = Ride.objects.all().order_by('-created_at')
                 if user_details.user_type == 'Driver':
-                    rides = Ride.objects.filter(driver=request.user)
+                    rides = Ride.objects.filter(driver=request.user).order_by('-created_at')
                 if user_details.user_type == 'Customer':
-                    rides = Ride.objects.filter(rider=request.user)
+                    rides = Ride.objects.filter(rider=request.user).order_by('-created_at')
                 if not rides.exists():
                     return Response({"message": "No data"}, status=status.HTTP_204_NO_CONTENT)
                 
-                serializer = RideSerializer(rides, many=True)
-                return Response(serializer.data, status=status.HTTP_200_OK)
 
-            serializer = RideSerializer(ride, many=False)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+                # import pdb;pdb.set_trace()
+                paginator = RidesPagination()
+                result_page = paginator.paginate_queryset(rides, request)
+
+                serializer = RideSerializer(result_page, many=True)
+
+                return paginator.get_paginated_response({'rides': serializer.data, 'last_page': paginator.page.paginator.num_pages})
+
+            # serializer = RideSerializer(ride, many=False)
+            # return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_403_FORBIDDEN)
-    
+            return Response({"detail": str(e)}, status=status.HTTP_403_FORBIDDEN)
+        
     def post(self, request):
-
         try:
+            # import pdb;pdb.set_trace()
             validate_data = request.data
-            validate_data['rider_id'] = request.user.id
-            validate_data['pickup_location'] = str(request.data.get('pickup_location'))
-            validate_data['dropoff_location'] = str(request.data.get('dropoff_location'))
-            status_instance = RideStatus.objects.filter(status='Requested').first()
+            validate_data['rider'] = request.user.id
+            validate_data['pickup_location'] = str(validate_data['pickup_location'])
+            validate_data['dropoff_location'] = str(validate_data['dropoff_location'])
+            status_instance = RideStatus.objects.get(status='Requested')
+            driver_id = request.data.get('driver_id')
             if status_instance:
                 validate_data['status'] = status_instance
+                ride_serializer = RideSerializer(data=validate_data)
+                if ride_serializer.is_valid():
+                    ride_serializer.save(rider_id = request.user.id, status_id = status_instance.id, driver_id = driver_id)
+                    return Response({'detail': 'Success'}, status=status.HTTP_200_OK)
+                else:
+                    return Response({'detail': ride_serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response({'detail': 'Invalid status ID'}, status=status.HTTP_400_BAD_REQUEST)
-            Ride.objects.create(**validate_data)
-            return Response({'detail': 'ride requested'}, status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_403_FORBIDDEN)
+
     
     def put(self, request):
         try:
+            import pdb;pdb.set_trace()
             if request.data.get('id'):
                 user_details = UserDetails.objects.get(user=request.user)
                 ride = Ride.objects.get(id = request.data.get('id'))
-                if user_details.user_type not in 'Driver' and ride.driver != request.user:
+                if ride.driver != request.user and ride.rider != request.user:
                     raise PermissionDenied("User does not have the privilege")
                 if request.data.get('status') == 'Accept' and ride.status.status == "Requested":
                     ride.status = RideStatus.objects.get(status = "Accepted")
@@ -155,7 +188,7 @@ class rideAPI(APIView):
                 else:
                     raise Exception("Invalid status transition")
                 ride.save()
-                return Response({'detail': 'Status updated'}, status=status.HTTP_200_OK)
+                return Response({'detail': 'Success'}, status=status.HTTP_200_OK)
             return Response({'detail': 'Invalid ID'}, status=status.HTTP_400_BAD_REQUEST)
         except PermissionDenied as e:
             return Response({"error": str(e)}, status=status.HTTP_403_FORBIDDEN)

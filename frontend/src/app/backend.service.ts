@@ -4,6 +4,7 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
+import swal from 'sweetalert';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +18,10 @@ export class BackendService {
     private router: Router,
     private authService: AuthService,
   ) {}
+
+  updateLocation(){
+    
+  }
 
   getDataBeforeLogin(url: string): Observable<any> {
     const headers = new HttpHeaders({
@@ -81,6 +86,14 @@ export class BackendService {
         if (error.status === 401 && error.error && error.error.code === 'token_not_valid') {
           this.authService.logout()
           this.router.navigate(['login']);
+        }
+        else if (error.status === 403) {
+
+          swal(error.error.detail, {
+            icon: "warning",
+          });
+          this.router.navigate(['']);
+          
         }
         return throwError(error);
       })

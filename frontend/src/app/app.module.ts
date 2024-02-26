@@ -19,6 +19,11 @@ import { UserAddComponent } from './user-add/user-add.component';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { GeolocationService } from './geolocation.service';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { GoogleMapsModule } from '@angular/google-maps';
+import { MyRidesComponent } from './my-rides/my-rides.component';
+import { RequestRideComponent } from './request-ride/request-ride.component'
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 @NgModule({
   declarations: [
@@ -29,7 +34,9 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     SignupComponent,
     UserListComponent,
     UserProfileComponent,
-    UserAddComponent
+    UserAddComponent,
+    MyRidesComponent,
+    RequestRideComponent
   ],
   imports: [
     BrowserModule,
@@ -43,6 +50,9 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     MatSelectModule,
     ToastrModule.forRoot(),
     NgbModule,
+    GoogleMapsModule,
+    MatAutocompleteModule,
+    NgxSpinnerModule,
   ],
   providers: [
     ToastrService,

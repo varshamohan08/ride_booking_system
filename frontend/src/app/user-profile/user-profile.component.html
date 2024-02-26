@@ -61,7 +61,20 @@
                     </div>
                 </div>
                 <div class="row mt-4" *ngIf="userDict['available'] && userType =='Driver'">
-                    <div [innerHTML]="safeHtmlMap" style="width: 100%;">{{safeHtmlMap}}</div>
+                    <div class="col-12">
+                        <google-map 
+                            height="400px"
+                            width="100%"
+                            [center]="center"
+                            [zoom]="zoom"
+                            (mapClick)="addMarker($event)"
+                            style="width: 100%;">
+                                <span *ngFor="let position of markers">
+                                <map-marker [position]="position" [options]="markerOptions" />
+                                </span>
+                        </google-map>
+
+                    </div>
                 </div>
             </div>
         </div>

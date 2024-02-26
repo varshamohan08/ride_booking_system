@@ -11,6 +11,7 @@ from user_app.serializers import UserDetailsSerializer
 from django.contrib.auth.models import User
 from rest_framework.pagination import PageNumberPagination
 from django.db import transaction
+from datetime import datetime
 
 class IsAdminUser(BasePermission):
     def has_permission(self, request, view):
@@ -67,6 +68,10 @@ class userApi(APIView):
     def get(self, request):
         try:
             # import pdb;pdb.set_trace()
+            user_details = UserDetails.objects.get(user = request.user)
+            if user_details.user_type != "Admin":
+                raise PermissionDenied("User does not have the privilege")
+            
             if request.GET.get('id'):
                 user_instance = UserDetails.objects.get(id=request.GET.get('id'))
                 user_serializer = UserDetailsSerializer(user_instance)
@@ -80,6 +85,8 @@ class userApi(APIView):
                 users_serializer = UserDetailsSerializer(result_page, many=True)
 
                 return paginator.get_paginated_response({'users': users_serializer.data, 'last_page': paginator.page.paginator.num_pages})
+        except PermissionDenied as e:
+            return Response({"detail": str(e)}, status=status.HTTP_403_FORBIDDEN)
         except Exception as e:
             return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
@@ -120,15 +127,10 @@ class userApi(APIView):
             user_details = UserDetails.objects.get(user = request.user)
             if user_details.user_type != "Driver":
                 raise PermissionDenied("User does not have the privilege")
-            msg = ''
             
             UserDetails.objects.filter(user=request.user).update(
                 available = not UserDetails.objects.get(user=request.user).available
             )
-            # if UserDetails.objects.get(user=request.user).available:
-            #     msg = "Status updated to Available"
-            # else:
-            #     msg = "Status updated to Not Available"
             
             return Response({'detail': "Success"}, status=status.HTTP_200_OK)
         except PermissionDenied as e:
@@ -252,7 +254,7 @@ class userSignUp(APIView):
         
 
     def put(self, request):
-        import pdb;pdb.set_trace()
+        # import pdb;pdb.set_trace()
         if not request.user:
             existing_user = UserDetails.objects.filter(user__username=request.data.get('username'))
         else:
@@ -260,3 +262,17 @@ class userSignUp(APIView):
         if existing_user.exists():
             return Response({'detail': "This username is already in use."}, status=status.HTTP_202_ACCEPTED)
         return Response({'detail': "Success"}, status=status.HTTP_200_OK)
+    
+class UpdateLocation(APIView):
+    permission_classes = [IsAuthenticated]
+    def put(self, request):
+        try:
+            position = request.data.get('position')
+            UserDetails.objects.filter(user=request.user).update(
+                location = position,
+                updated_by = request.user,
+                updated_at = datetime.now()
+            )
+            return Response({'detail': 'Success'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)

@@ -7,6 +7,8 @@ import { UserListComponent } from './user-list/user-list.component';
 import { AuthGuard } from './auth.guard';
 import { UserProfileComponent } from './user-profile/user-profile.component';
 import { UserAddComponent } from './user-add/user-add.component';
+import { MyRidesComponent } from './my-rides/my-rides.component';
+import { RequestRideComponent } from './request-ride/request-ride.component';
 
 const routes: Routes = [
   {
@@ -40,6 +42,17 @@ const routes: Routes = [
         component: UserAddComponent,
         canActivate: [AuthGuard]
       },
+      {
+        path: 'myrides',
+        component: MyRidesComponent,
+        canActivate: [AuthGuard]
+      },
+      {
+        path: 'requestride',
+        component: RequestRideComponent,
+        canActivate: [AuthGuard]
+      },
+
 
     ],
   },

@@ -512,3 +512,15 @@ body.dark .modal .close {
 .light-blue-backdrop {
     background-color: #5cb3fd;
 }
+
+img[src="marker-icon.png"] {
+    /* Your styles here */
+    display: none;
+}
+img[src="marker-shadow.png"] {
+    /* Your styles here */
+    display: none;
+}
+// path {
+//     stroke: black !important;
+// }

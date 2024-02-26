@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { GeolocationService } from './geolocation.service';
 
 
 interface UserDetails {
@@ -12,7 +13,9 @@ interface UserDetails {
 })
 export class AuthService {
 
-  constructor() { }
+  constructor(
+    private locationService: GeolocationService,
+  ) { }
 
   isLoggedIn(): boolean {
     // Check if the user is logged in based on the presence of an access token
@@ -24,7 +27,13 @@ export class AuthService {
     localStorage.removeItem('username');
     localStorage.removeItem('user_type');
     localStorage.removeItem('access_token');
+    let watchID = localStorage.getItem('watchID');
+    if (watchID) {
+      navigator.geolocation.clearWatch(Number(watchID));
+      localStorage.removeItem('watchID');
+    }
     window.location.reload()
+    this.locationService.clearLocation()
   }
 
   setUserData(userdetails:UserDetails, access_token: string) {

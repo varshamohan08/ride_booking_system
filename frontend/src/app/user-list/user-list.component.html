@@ -2,21 +2,20 @@
   <button class="add-btn icon-btn" title="Add User" routerLink="/add-user">
       <i class="fa fa-user-plus" aria-hidden="true"></i>
   </button>
-    <h2 style="margin-top: 8%;">User List</h2>
-    <div class="row mt-2">
-      <div class="col-12 mt-2">
+  <h2 style="margin-top: 8%;">User List</h2>
+  <div class="row mt-2">
+    <div class="col-12 mt-2">
 
-        <mat-form-field appearance="outline" style="width: 100%;">
-          <mat-label>Search...</mat-label>
-          <mat-icon matSuffix>search</mat-icon>
-          <input matInput type="text" [(ngModel)]="searchText" placeholder="Search..." (ngModelChange)="applyFilter()">
-        </mat-form-field>
-      </div>
-      <div class="col-12">
-      </div>
-    <div class="filter-box mt-4">
+      <mat-form-field appearance="outline" style="width: 100%;">
+        <mat-label>Search...</mat-label>
+        <mat-icon matSuffix>search</mat-icon>
+        <input matInput type="text" [(ngModel)]="searchText" placeholder="Search..." (ngModelChange)="applyFilter()">
+      </mat-form-field>
+    </div>
+    <div class="col-12">
+  </div>
+  <div class="filter-box mt-4">
     <table class="table table-hover mt-4">
-    <!-- <table class="table table-dark table-hover"> -->
       <thead>
         <tr>
           <th>Type</th>
@@ -55,5 +54,5 @@
           </li>
         </ul>
     </div>
-</div>
+  </div>
 </div>

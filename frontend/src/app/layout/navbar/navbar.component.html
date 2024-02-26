@@ -32,10 +32,11 @@
                                 </li>
                                 
                                 <li class="nav-item pl-4 pl-md-0 ml-0 ml-md-4">
-                                    <a class="nav-link">Rides</a>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item">Request Ride</a>
-                                        <a class="dropdown-item">Past Rides</a>
+                                    <a class="nav-link dropdown-toggle" id="rideDropdown" data-toggle="dropdown">Rides</a>
+                                    <div class="dropdown-menu" aria-labelledby="rideDropdown">
+                                        <a class="dropdown-item" *ngIf="userType=='Customer'" routerLink="/requestride">Request Ride</a>
+                                        <a class="dropdown-item" *ngIf="userType=='Driver'">Requests</a>
+                                        <a class="dropdown-item" routerLink="/myrides">My rides</a>
                                         <!-- <a class="dropdown-item">Something else here</a>
                                         <a class="dropdown-item">Another action</a> -->
                                     </div>
@@ -54,9 +55,13 @@
                                 </li>
                                 <li class="nav-item pl-4 pl-md-0 ml-0 ml-md-4" *ngIf="!userType">
                                     <a class="nav-link" routerLink="/login">LogIn</a>
+                                    <div class="dropdown-menu">
+                                    </div>
                                 </li>
                                 <li class="nav-item pl-4 pl-md-0 ml-0 ml-md-4" *ngIf="!userType">
-                                    <a class="nav-link" routerLink="/signup">SignIn</a>
+                                    <a class="nav-link" routerLink="/signup">SignUp</a>
+                                    <div class="dropdown-menu">
+                                    </div>
                                 </li>
                                 <!-- <li class="nav-item pl-4 pl-md-0 ml-0 ml-md-4" *ngIf="userType">
                                     <a class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" routerLink="/profile">

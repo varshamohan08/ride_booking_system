@@ -6,6 +6,9 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import swal from 'sweetalert';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
+import { GeolocationService } from '../geolocation.service';
+import { Subscription } from 'rxjs';
+// import google from '@angular/google-maps';
 
 interface UserDetails {
   available: boolean,
@@ -52,6 +55,26 @@ export class UserProfileComponent {
   confirmpasswordBln = false
 
   mapUrl: SafeResourceUrl | undefined;
+
+  zoom = 18;
+  center!: google.maps.LatLngLiteral;
+  options: google.maps.MapOptions = {
+    mapTypeId: 'hybrid',
+    zoomControl: false,
+    scrollwheel: false,
+    disableDoubleClickZoom: true,
+    maxZoom: 15,
+    minZoom: 8,
+  };
+  markers:any = []
+  // zoom = 4;
+  markerOptions: google.maps.MarkerOptions = {draggable: false};
+  markerPositions: google.maps.LatLngLiteral[] = [];
+  locationSubscription:any;
+  prevLatitude:any;
+  prevLongitude:any;
+
+
   constructor(
     private backendService: BackendService,
     private authService: AuthService,
@@ -59,6 +82,7 @@ export class UserProfileComponent {
     private sanitizer: DomSanitizer,
     private modalService: NgbModal,
     private toastr: ToastrService,
+    private locationService: GeolocationService
   ) {
     this.userDict = {} as UserDetails;
     modalRef: NgbModalRef;
@@ -87,25 +111,66 @@ export class UserProfileComponent {
       this.userDict= res['user']
       if(res['user']['available']) {
         console.log('in');
-        
-        this.watchId = navigator.geolocation.watchPosition(
-          position => {
-            // this.html_map = '<div style="overflow:hidden;resize:none;max-width:100%;width:500px;height:500px;"><div id="gmap-canvas" style="height:100%; width:100%;max-width:100%;"><iframe style="height:100%;width:100%;border:0;" frameborder="0" src="https://www.google.com/maps/embed/v1/directions?origin='+position.coords.latitude+','+position.coords.longitude+'&destination=Kalamassery,+'+position.coords.latitude+','+position.coords.longitude+'&key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8"></iframe></div><a class="google-map-code-enabler" href="https://www.bootstrapskins.com/themes" id="grab-map-authorization">premium bootstrap themes</a><style>#gmap-canvas img{max-width:none!important;background:none!important;font-size: inherit;font-weight:inherit;}</style></div>'
-
-            console.log(position.coords);
-
-            this.safeHtmlMap = this.sanitizer.bypassSecurityTrustHtml('<div class="mapouter" style="width:100%"><div class="gmap_canvas" style="width:100%"><iframe style="width:100%" height="500" id="gmap_canvas" src="https://maps.google.com/maps?q='+position.coords.latitude+','+position.coords.longitude+'&t=&z=17&ie=UTF8&iwloc=&output=embed" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe><a href="https://123movies-to.org"></a><br><style>.mapouter{position:relative;text-align:right;height:500px;width:600px;}</style><a href="https://www.embedgooglemap.net"></a><style>.gmap_canvas {overflow:hidden;background:none!important;height:500px;width:600px;}</style></div></div>');
-            console.log(this.safeHtmlMap);
-
-            
-          }
-        );
+        // if(!localStorage.getItem('watchID')) {
+          this.locationService.watchLocation()
+        // }
+        this.watchLocation();
+        this.locationSubscription = setInterval(() => {
+          this.watchLocation(); 
+        }, 10000);
+      }
+      else{
+        this.clearWatch()
       }
     }
     ,(error)=> {
       console.error(error);
     }
     )
+  }
+  ngOnDestroy() {
+    if (this.locationSubscription) {
+      clearInterval(this.locationSubscription);
+    }
+  }
+  watchLocation() {   
+    if (Number(localStorage.getItem('latitude')) != this.prevLatitude || Number(localStorage.getItem('longitude')) != this.prevLongitude) {
+        this.center = {
+          lat: Number(localStorage.getItem('latitude')),
+          lng: Number(localStorage.getItem('longitude')),
+        };
+        this.markers= [new google.maps.LatLng(
+            Number(localStorage.getItem('latitude')),
+            Number(localStorage.getItem('longitude'))
+          )]
+        console.log(this.markers,'marker');
+        this.prevLatitude = Number(localStorage.getItem('latitude'))
+        this.prevLongitude = Number(localStorage.getItem('longitude'))
+        // localStorage.setItem('watchID', this.watchId)
+      }
+    // );
+  }
+
+  clearWatch() {
+    navigator.geolocation.clearWatch(this.watchId)
+    localStorage.removeItem('watchID');
+  }
+ 
+  addMarker(event: google.maps.MapMouseEvent) {
+    if(event.latLng){
+      console.log(event.latLng);
+      
+      this.markerPositions.push(event.latLng.toJSON());
+    }
+    
+  }
+
+  zoomIn() {
+    if (this.options.maxZoom && this.zoom < this.options.maxZoom) this.zoom++;
+  }
+ 
+  zoomOut() {
+    if (this.options.minZoom && this.zoom > this.options.minZoom) this.zoom--;
   }
   editProfile() {
 
