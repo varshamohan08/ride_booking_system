@@ -1,6 +1,0 @@
-backend running on port 8000
-user module
------------
-
-http://localhost:8000/login
----------------------------

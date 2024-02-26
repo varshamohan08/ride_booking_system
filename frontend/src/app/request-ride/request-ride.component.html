@@ -1,0 +1,75 @@
+<div class="container">
+    <!-- <h2 style="margin-top: 8%;">User List</h2> -->
+    <div class="filter-box mb-2" style="margin-top: 8%;">
+        <div class="row">
+            <div class="col-sm-12 col-md-6 col-lg-4" style="padding: 4%; text-align: center;">
+                
+                <div class="row mt-2">
+                    <!-- <div class="col-sm-12 col-md-6 col-lg-6 mt-2"> -->
+                        <mat-form-field appearance="outline" style="width: 100%;">
+                            <mat-label>Your Location</mat-label>
+                            <mat-icon matPrefix>location_on</mat-icon>
+                            <input matInput type="text" placeholder="Your Location" [formControl]="locationControl" [matAutocomplete]="auto" [(ngModel)]="locationName" (click)="findCoordinates(locationName)" (ngModelChange)="findCoordinates(locationName)">
+                            <mat-autocomplete #auto="matAutocomplete">
+                                <mat-option *ngFor="let loc of filteredLocations" (click)="onLocationSelected(loc)">
+                                    {{ loc.display_name }}
+                                </mat-option>
+                            </mat-autocomplete>
+                            <mat-hint style="color: aqua;"><a (click)="shareLocation()">Share Location  <i class="fa fa-map-pin"></i></a></mat-hint>
+                        </mat-form-field>
+                    <!-- </div>
+                    <div class="col-sm-12 col-md-6 col-lg-6 mt-2"> -->
+                        <mat-form-field appearance="outline" style="width: 100%;">
+                            <mat-label>Destination</mat-label>
+                            <mat-icon matPrefix>location_on</mat-icon>
+                            <input matInput type="text" placeholder="Destination" [matAutocomplete]="autodestin" [(ngModel)]="destinLocationName" (click)="findCoordinates(destinLocationName)" (ngModelChange)="findCoordinates(destinLocationName)">
+                            <mat-autocomplete #autodestin="matAutocomplete">
+                                <mat-option *ngFor="let loc of filteredLocations" (click)="onDestinLocationSelected(loc)">
+                                    {{ loc.display_name }}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+                    <!-- </div> -->
+                </div>
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <button type="submit" id="submit" name="send" class="btn login-btn" (click)="checkRides()">Check Available Rides</button>
+                        <!-- <button type="submit" id="submit" name="send" class="btn login-btn" (click)="userSignUp()">Cancel</button> -->
+                    </div>
+                </div>
+                <div class="rides row mt-2" *ngFor="let user of availableRides; let i = index" [class.active]="i === activeRowIndex" (click)="setActiveRow(i)">
+                    <div class="col-8" style="text-align: left;">
+                        <b>{{ user['type'] }}</b><br>
+                        <small>{{ user['time'] }} away</small>
+                    </div>
+                    <div class="col-4">
+                        <div class="rideamount"><b>₹ {{ user['amount'] }}</b></div>
+                    </div>
+                </div>
+                <div class="row mt-2" *ngIf="availableRides.length > 0">
+                    <div class="col-12">
+                        <button type="submit" id="submit" name="send" class="btn login-btn" (click)="bookRides()" [disabled]="blnBookRides">Book {{carName}}</button>
+                        <!-- <button type="submit" id="submit" name="send" class="btn login-btn" (click)="userSignUp()">Cancel</button> -->
+                    </div>
+                </div>
+                
+            </div>
+            <div class="col-sm-12 col-md-6 col-lg-8" style="padding: 4%;">
+                <div class="row mt-2" style="height: 100%;">
+                    <div class="col-12" style="height: 100%;">
+                        <!-- render map with google directions api -->
+                          <!-- <google-map #myMap height="400px" style="width: 100%;" *ngIf="directions">
+                            <map-directions-renderer #directionsRenderer [directions]="directions"></map-directions-renderer>
+                        </google-map> -->
+
+                        <div id="map" style="height: 100%; min-height: 400px;"></div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<ngx-spinner bdColor="rgba(0, 0, 0, 1)"></ngx-spinner>

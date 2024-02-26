@@ -1,0 +1,98 @@
+<div class="container" *ngIf="!showSignInRide && !showSignInDrive">
+    <div class="box">
+      <div class="row">
+        <div class="col-12" style="padding: 4%;">
+          <h2 class="mt-2" style="border-bottom: 1px solid;" (click)="showSignInBox('drive')">
+              <a class="link-color-slide" data-content="Sign up to drive">
+                  Sign up to drive
+                  <svg style="margin-top: -1%;" width="32" height="28" viewBox="0 0 24 24" fill="none"><path d="m22.2 12-6.5 9h-3.5l5.5-7.5H2v-3h15.7L12.2 3h3.5l6.5 9Z" fill="currentColor"></path></svg>
+              </a>
+          </h2>
+        </div>
+        <div class="col-12" style="padding: 4%;">
+          <h2 class="mt-2" style="border-bottom: 1px solid;">
+              <a class="link-color-slide" data-content="Sign up to ride" (click)="showSignInBox('ride')">
+                  Sign up to ride
+                  <svg style="margin-top: -1%;" width="32" height="28" viewBox="0 0 24 24" fill="none"><path d="m22.2 12-6.5 9h-3.5l5.5-7.5H2v-3h15.7L12.2 3h3.5l6.5 9Z" fill="currentColor"></path></svg>
+              </a>
+          </h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+<div class="container" *ngIf="showSignInRide || showSignInDrive">
+    <!-- <h2 style="margin-top: 8%;">User List</h2> -->
+    <div class="filter-box mb-2" style="margin-top: 8%;">
+        <button class="close-btn icon-btn" title="Add User" (click)="closeSignInBox()">
+            <i class="fa fa-times" aria-hidden="true"></i>
+        </button>
+        <h2 class="mt-2">User details</h2>
+        <div class="row mt-2">
+            <div class="col-sm-12 col-md-6 col-lg-6 mt-2">
+                <mat-form-field appearance="outline" style="width: 100%;">
+                    <mat-label>Username</mat-label>
+                    <mat-icon matPrefix>person</mat-icon>
+                    <input matInput type="text" [(ngModel)]="username" placeholder="Username" (ngModelChange)="checkUsername()">
+                    <mat-hint *ngIf="username && error_message!=''" style="color: darkred;">{{error_message}}</mat-hint>
+                </mat-form-field>
+            </div>
+            <div class="col-sm-12 col-md-6 col-lg-6 mt-2">
+                <mat-form-field appearance="outline" style="width: 100%;">
+                    <mat-label>First name</mat-label>
+                    <mat-icon matPrefix>person</mat-icon>
+                    <input matInput type="text" [(ngModel)]="first_name" placeholder="First name">
+                </mat-form-field>
+            </div>
+            <div class="col-sm-12 col-md-6 col-lg-6 mt-2">
+                <mat-form-field appearance="outline" style="width: 100%;">
+                    <mat-label>Last name</mat-label>
+                    <mat-icon matPrefix>person</mat-icon>
+                    <input matInput type="text" [(ngModel)]="last_name" placeholder="Last name">
+                </mat-form-field>
+                <!-- <small>Type :&nbsp;</small>
+                <div class="mt-2" style="font-weight: bold;">{{userType}}</div> -->
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-sm-12 col-md-6 col-lg-6 mt-2">
+                <mat-form-field appearance="outline" style="width: 100%;">
+                    <mat-label>Email</mat-label>
+                    <mat-icon matPrefix>email</mat-icon>
+                    <input matInput type="text" [(ngModel)]="email" placeholder="Email">
+                </mat-form-field>
+            </div>
+            <div class="col-sm-12 col-md-6 col-lg-6 mt-2">
+                <mat-form-field appearance="outline" style="width: 100%;">
+                    <mat-label>Mobile</mat-label>
+                    <mat-icon matPrefix>local_phone</mat-icon>
+                    <input matInput type="text" [(ngModel)]="mobile" placeholder="Mobile">
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-sm-12 col-md-6 col-lg-6 mt-2">
+                <mat-form-field appearance="outline" style="width: 100%;">
+                    <mat-label>Password</mat-label>
+                    <mat-icon matPrefix>key</mat-icon>
+                    <input matInput type="text" [(ngModel)]="password" placeholder="Password">
+                </mat-form-field>
+            </div>
+            <div class="col-sm-12 col-md-6 col-lg-6 mt-2">
+                <mat-form-field appearance="outline" style="width: 100%;">
+                    <mat-label>Confirm Password</mat-label>
+                    <mat-icon matPrefix>key</mat-icon>
+                    <input matInput type="text" [(ngModel)]="confirmPassword" placeholder="Confirm Password" (ngModelChange)="confirmPasswordFn()">
+                    <mat-hint *ngIf="confirmpasswordBln" style="color: gray;">Hint : {{confirmPasswordHint}}</mat-hint>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-4">
+                <button type="submit" id="submit" name="send" class="btn login-btn" (click)="userSignUp()">Sign Up</button>
+                <!-- <button type="submit" id="submit" name="send" class="btn login-btn" (click)="userSignUp()">Cancel</button> -->
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,61 @@
+<div class="container container-content">
+    <h2 style="margin-top: 8%;">My rides</h2>
+    <div class="row mt-2">
+      <div class="col-12 mt-2">
+  
+        <!-- <mat-form-field appearance="outline" style="width: 100%;">
+          <mat-label>Search...</mat-label>
+          <mat-icon matSuffix>search</mat-icon>
+          <input matInput type="text" [(ngModel)]="searchText" placeholder="Search..." (ngModelChange)="applyFilter()">
+        </mat-form-field> -->
+      </div>
+      <div class="col-12">
+    </div>
+    <div class="filter-box mt-4">
+      <table class="table table-hover mt-4">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Pickup</th>
+            <th>DropOff</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let ride of paginatedRides">
+            <td>{{ride['created_at'] | date}}</td>
+            <td>{{ride['driver_vehicle_type']}}</td>
+            <td>{{ride['pickup_location']['name']}}</td>
+            <td>{{ride['dropoff_location']['name']}}</td>
+            <td style="width: 14%;
+            text-align: center;">
+                <div style="padding: 4%;
+                border-radius: 10px;" [style.background-color]="ride['color']">
+                    {{ride["status"]["status"] | titlecase}} 
+                </div> 
+            </td>
+            <td>
+              <button class="action-fa-btn" title="View" *ngIf="ride['status']['status'] == 'accepted'">
+                <i class="fa fa-eye"></i>
+              </button>
+              <button class="action-fa-btn" title="Cancel" *ngIf="ride['status']['status'] == 'Requested' && userType == 'Customer'">
+                <i class="fa fa-times" (click)="changeStatus(ride['id'], 'Cancel')"></i>
+              </button>
+              <button class="action-fa-btn" title="Acknowledge" *ngIf="ride['status']['status'] == 'Requested' && userType == 'Driver'">
+                <i class="fa fa-check"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div *ngIf="paginator && paginator.lastPage > 1" style="margin-bottom: 4%;">
+          <ul class="pagination">
+            <li class="page-item" *ngFor="let page of paginator.pages" [class.active]="paginator.currentPage === page">
+              <a class="page-link" (click)="changePage(page)">{{ page }}</a>
+            </li>
+          </ul>
+      </div>
+    </div>
+  </div>

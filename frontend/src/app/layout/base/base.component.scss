@@ -1,0 +1,13 @@
+.layout-box{
+    overflow: auto;
+    height: -webkit-fill-available;
+}
+.layout-box::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.layout-box {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}

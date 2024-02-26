@@ -1,0 +1,16 @@
+.rides {
+    padding: 5%;
+    border: 1px solid transparent; /* Initially transparent */
+    border-radius: 10px;
+}
+
+.rides.active {
+    border-color: black; /* Apply border color when active */
+}
+
+.rideamount {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
