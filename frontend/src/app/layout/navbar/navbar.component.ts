@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/auth.service';
 import { BackendService } from 'src/app/backend.service';
+import { RideService } from 'src/app/ride.service';
 
 @Component({
   selector: 'app-navbar',
@@ -19,6 +20,7 @@ export class NavbarComponent {
     private backendService: BackendService,
     private authService: AuthService,
     private router: Router,
+    private rideService: RideService,
   ) {}
 
   ngOnInit() {
@@ -30,6 +32,15 @@ export class NavbarComponent {
       
         this.toggleDarkMode();
     }
+    this.rideService.subscribeToRideNotifications();
+    this.rideService.getRideNotifications().subscribe(notification => {
+      console.log('notification', notification)
+      if (notification.type === 'new_ride') {
+        console.log('New ride created:', notification.ride_id);
+      } else if (notification.type === 'status_update') {
+        console.log('Ride status updated:', notification.ride_id, notification.status);
+      }
+    });
   }
 
   toggleDarkMode() {

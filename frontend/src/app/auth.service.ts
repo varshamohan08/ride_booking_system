@@ -36,9 +36,10 @@ export class AuthService {
     this.locationService.clearLocation()
   }
 
-  setUserData(userdetails:UserDetails, access_token: string) {
+  setUserData(userdetails:any, access_token: string) {
     localStorage.setItem('username', userdetails['username'])
     localStorage.setItem('user_type', userdetails['user_type'])
+    localStorage.setItem('id', userdetails['id'])
     localStorage.setItem('access_token', access_token)
     // window.location.reload()
   }

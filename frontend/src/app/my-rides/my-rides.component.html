@@ -43,8 +43,11 @@
               <button class="action-fa-btn" title="Cancel" *ngIf="ride['status']['status'] == 'Requested' && userType == 'Customer'">
                 <i class="fa fa-times" (click)="changeStatus(ride['id'], 'Cancel')"></i>
               </button>
-              <button class="action-fa-btn" title="Acknowledge" *ngIf="ride['status']['status'] == 'Requested' && userType == 'Driver'">
-                <i class="fa fa-check"></i>
+              <button class="action-fa-btn" title="Accept" *ngIf="ride['status']['status'] == 'Requested' && userType == 'Driver'">
+                <i class="fa fa-check" (click)="changeStatus(ride['id'], 'Accept')"></i>
+              </button>
+              <button class="action-fa-btn" title="View progress" *ngIf="ride['status']['status'] != 'Requested'">
+                <i class="fa fa-eye" (click)="viewRide(ride['id'])"></i>
               </button>
             </td>
           </tr>

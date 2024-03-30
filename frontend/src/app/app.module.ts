@@ -24,6 +24,8 @@ import { MyRidesComponent } from './my-rides/my-rides.component';
 import { RequestRideComponent } from './request-ride/request-ride.component'
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { NgxSpinnerModule } from 'ngx-spinner';
+import { RideService } from './ride.service';
+import { ViewRideComponent } from './view-ride/view-ride.component';
 
 @NgModule({
   declarations: [
@@ -36,7 +38,8 @@ import { NgxSpinnerModule } from 'ngx-spinner';
     UserProfileComponent,
     UserAddComponent,
     MyRidesComponent,
-    RequestRideComponent
+    RequestRideComponent,
+    ViewRideComponent
   ],
   imports: [
     BrowserModule,
@@ -56,7 +59,8 @@ import { NgxSpinnerModule } from 'ngx-spinner';
   ],
   providers: [
     ToastrService,
-    GeolocationService
+    GeolocationService,
+    RideService,
   ],
   bootstrap: [AppComponent]
 })

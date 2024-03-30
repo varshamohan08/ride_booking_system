@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-%agk@stg@m+uj!n^wr#rx#sfjcp!j&oji&6-oz@r2=#74pbr^('
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'debug_toolbar',
+    'channels',
     'rides',
     'user_app',
 ]
@@ -78,7 +79,13 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'ride_drf.wsgi.application'
+ASGI_APPLICATION = 'ride_drf.asgi.application'
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",\
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases

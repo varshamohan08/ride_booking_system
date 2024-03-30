@@ -48,34 +48,62 @@ export class MyRidesComponent {
   }
 
   changeStatus(id: any, status:any) {
-    swal({
-      title: 'Cancel Ride',
-      text: 'Driver yet to acknowledge, do you want to cancel the ride request',
-      icon: "warning",
-      buttons: ["Cancel", "OK"],
-      dangerMode: true,
-    })
-    .then((value) => {
-      console.log(value, 'value');
-      
-      if (value) {
+    let swaltext = ""
+    let resulttext = ""
+    let swaltitle = ""
 
-        this.backendService.putData(`ride/ride_api`, {'id':id, 'status': status}).subscribe((res) => {
-          if (res['detail'] === 'Success') {
-            swal('Ride canceled', {
-              icon: "success",
-            }).then(() => {
-              this.rideData()
-            });
-          }
-          else {
-            swal("Something went wrong, please try again.", {
-              icon: "error",
-            });
-          }
-        });
+    new Promise<void>((resolve) => {
+      if (status == 'Cancel') {
+        swaltitle = "Cancel Ride"
+        swaltext = "Driver yet to acknowledge, do you want to cancel the ride request"
+        resulttext = "Ride canceled"
+      }
+      else if (status == 'Accept') {
+        swaltitle = "Accept Ride"
+        swaltext = "Do you want to accept the ride request"
+        resulttext = "Ride accepted"
+      }
+
+      if (swaltitle != "") {
+          resolve();
+      }
+    }).then(() => {
+      swal({
+        title: swaltitle,
+        text: swaltext,
+        icon: "warning",
+        buttons: ["Cancel", "OK"],
+        dangerMode: true,
+      })
+      .then((value) => {
+        console.log(value, 'value');
         
-      } 
+        if (value) {
+  
+          this.backendService.putData(`ride/ride_api`, {'id':id, 'status': status}).subscribe((res) => {
+            if (res['detail'] === 'Success') {
+              swal(resulttext, {
+                icon: "success",
+              }).then(() => {
+                this.rideData()
+              });
+            }
+            else {
+              swal("Something went wrong, please try again.", {
+                icon: "error",
+              });
+            }
+          });
+          
+        } 
+      });
+    })
+    .catch((error) => {
+        console.error('Error:', error);
     });
+  }
+
+  viewRide(id: any) {
+    this.router.navigate(['view'], { queryParams: { id: id } });
   }
 }

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from user_app.models import UserDetails, vehicle_type
-from user_app.serializers import UserSerializer
+from user_app.serializers import AllUserDetailsSerializer
 from .models import Ride, RideStatus
 
 class RideStatusSerializer(serializers.ModelSerializer):
@@ -10,8 +10,8 @@ class RideStatusSerializer(serializers.ModelSerializer):
 
 class RideSerializer(serializers.ModelSerializer):
     status = RideStatusSerializer(read_only=True) 
-    rider = UserSerializer(read_only=True)
-    driver = UserSerializer(read_only=True)
+    rider = AllUserDetailsSerializer(read_only=True)
+    driver = AllUserDetailsSerializer(read_only=True)
 
     class Meta:
         model = Ride
@@ -19,8 +19,12 @@ class RideSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['pickup_location'] = eval(instance.pickup_location)
-        representation['dropoff_location'] = eval(instance.dropoff_location)
+        representation['pickup_location'] = instance.pickup_location
+        representation['dropoff_location'] = instance.dropoff_location
+        if type(representation['pickup_location'] != dict):
+            representation['pickup_location'] = eval(representation['pickup_location'])
+        if type(representation['dropoff_location'] != dict):
+            representation['dropoff_location'] = eval(representation['dropoff_location'])
         if instance.driver:
             representation['driver_vehicle_type'] = instance.driver.user_details.vehicle_type.type
         if instance.status:
