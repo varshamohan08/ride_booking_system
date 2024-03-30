@@ -1,0 +1,75 @@
+
+
+  <div class="container">
+    <div class="filter-box mb-2" style="margin-top: 8%;">
+        <h2>Details</h2>
+        <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="row mt-2" style="height: 100%;" *ngIf="rideDetails['status']['status'] == 'Accepted' || rideDetails['status']['status'] == 'Started'">
+                <div class="col-12" style="height: 100%;">
+
+                    <div id="map" style="height: 100%; min-height: 400px;"></div>
+
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12 col-md-6 col-lg-6 mt-2 ml-2">
+                    <div class="row mt-2">
+                        <div class="col-12 mt-2">
+                            <small>Status :&nbsp;</small>
+                            <div class="mt-2">{{rideDetails['status']['status'] | titlecase}}</div>
+                        </div>
+                        <div class="col-12 mt-2">
+                            <small>Pickup :&nbsp;</small>
+                            <div class="mt-2">{{rideDetails['pickup_location']['name']}}</div>
+                        </div>
+                        <div class="col-12 mt-2">
+                            <small>Dropoff :&nbsp;</small>
+                            <div class="mt-2">{{rideDetails['dropoff_location']['name']}}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" *ngIf="userType=='Driver' || userType=='Admin'">
+                <div class="col-12 mt-2">
+                    <button class="btn save-btn" *ngIf="actionBtnValue" (click)="changeStatus()">{{actionBtnName}}</button>
+                </div>
+                <div class="col-sm-12 col-md-6 col-lg-6 mt-2 ml-2">
+                    <div class="row mt-2">
+                        <small style="font-weight: bold;">Customer details</small>
+                        <div class="col-12 mt-2">
+                            <small>Name :&nbsp;</small>
+                            <div class="mt-2">{{rideDetails['rider']['user_details']['first_name'] | titlecase}} {{rideDetails['rider']['user_details']['last_name'] | titlecase}}</div>
+                        </div>
+                        <div class="col-12 mt-2">
+                            <small>Email :&nbsp;</small>
+                            <div class="mt-2">{{rideDetails['rider']['user_details']['email']}}</div>
+                        </div>
+                        <div class="col-12 mt-2">
+                            <small>Mobile :&nbsp;</small>
+                            <div class="mt-2">{{rideDetails['rider']['user_details']['mobile']}}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" *ngIf="userType=='Customer' || userType=='Admin'">
+                <div class="col-sm-12 col-md-6 col-lg-6 mt-2 ml-2">
+                    <div class="row mt-2">
+                        <small style="font-weight: bold;">Driver details</small>
+                        <div class="col-12 mt-2">
+                            <small>Name :&nbsp;</small>
+                            <div class="mt-2">{{rideDetails['driver']['user_details']['first_name'] | titlecase}} {{rideDetails['driver']['user_details']['last_name'] | titlecase}}</div>
+                        </div>
+                        <div class="col-12 mt-2">
+                            <small>Email :&nbsp;</small>
+                            <div class="mt-2">{{rideDetails['driver']['user_details']['email']}}</div>
+                        </div>
+                        <div class="col-12 mt-2">
+                            <small>Mobile :&nbsp;</small>
+                            <div class="mt-2">{{rideDetails['driver']['user_details']['mobile']}}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

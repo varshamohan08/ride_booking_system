@@ -9,6 +9,7 @@ import { UserProfileComponent } from './user-profile/user-profile.component';
 import { UserAddComponent } from './user-add/user-add.component';
 import { MyRidesComponent } from './my-rides/my-rides.component';
 import { RequestRideComponent } from './request-ride/request-ride.component';
+import { ViewRideComponent } from './view-ride/view-ride.component';
 
 const routes: Routes = [
   {
@@ -50,6 +51,11 @@ const routes: Routes = [
       {
         path: 'requestride',
         component: RequestRideComponent,
+        canActivate: [AuthGuard]
+      },
+      {
+        path: 'view',
+        component: ViewRideComponent,
         canActivate: [AuthGuard]
       },
 

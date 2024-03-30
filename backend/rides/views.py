@@ -60,7 +60,10 @@ class requestRide(APIView):
 
                 for each_driver in drivers.data:
 
-                    location_dict = literal_eval(each_driver['location'])
+                    location_dict = each_driver['location']
+                    if(type(location_dict) != dict):
+                        location_dict = literal_eval(location_dict)
+                    
 
                     point3 = (location_dict['latitude'], location_dict['longitude'])
 
@@ -83,7 +86,7 @@ class requestRide(APIView):
                             'type' : each_vehicle_type['type'],
                             'driver' : each_driver['user'],
                             'amount' :amount,
-                            'location' : eval(each_driver['location'])
+                            'location' : location_dict
                         }
                         
                     else:
@@ -99,7 +102,7 @@ class requestRide(APIView):
                             'type' : each_vehicle_type['type'],
                             'driver' : each_driver['user'],
                             'amount' :amount,
-                            'location' : eval(each_driver['location'])
+                            'location' : location_dict
                         }
 
             return Response({"detail": "Success", "rides": vehicle_dict.values()}, status=status.HTTP_200_OK)
@@ -118,9 +121,13 @@ class rideAPI(APIView):
     def get(self, request):
         try:
             if request.GET.get('id'):
-                ride = Ride.objects.filter(id=request.GET.get('id')).first()
-                if not ride:
-                    return Response({"message": "No data"}, status=status.HTTP_204_NO_CONTENT)
+                ride_instance = Ride.objects.get(id=request.GET.get('id'))
+                if request.GET.get('action') and request.GET.get('action')=='location':
+                    driver_instance = UserDetails.objects.get(user = ride_instance.driver)
+                    return Response({'detail': 'Success', 'location': driver_instance.location}, status=status.HTTP_200_OK)
+                    
+                ride_serializer = RideSerializer(ride_instance)
+                return Response({'detail': 'Success', 'ride': ride_serializer.data}, status=status.HTTP_200_OK)
             else:
                 user_details = UserDetails.objects.get(user=request.user)
                 if user_details.user_type == 'Admin':
@@ -133,11 +140,13 @@ class rideAPI(APIView):
                     return Response({"message": "No data"}, status=status.HTTP_204_NO_CONTENT)
                 
 
-                # import pdb;pdb.set_trace()
                 paginator = RidesPagination()
                 result_page = paginator.paginate_queryset(rides, request)
 
                 serializer = RideSerializer(result_page, many=True)
+                # import pdb;pdb.set_trace()
+                # for item in serializer.data:
+                #     print(item)
 
                 return paginator.get_paginated_response({'rides': serializer.data, 'last_page': paginator.page.paginator.num_pages})
 
@@ -171,7 +180,6 @@ class rideAPI(APIView):
     
     def put(self, request):
         try:
-            import pdb;pdb.set_trace()
             if request.data.get('id'):
                 user_details = UserDetails.objects.get(user=request.user)
                 ride = Ride.objects.get(id = request.data.get('id'))

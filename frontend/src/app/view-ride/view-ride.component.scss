@@ -1,0 +1,29 @@
+.user-profile {
+    width: 100%;
+    border-radius: 220px;
+}
+.profile-box {
+    padding: 2%;
+    box-shadow: 0px 4px 27px rgb(77, 82, 109) !important;
+    border-radius: 220px;
+    box-shadow: none;
+}
+.username {
+    font-size: small;
+}
+.name {
+    font-weight: 1000;
+    color: #8167a9;
+}
+
+
+.dark-modal .modal-content {
+    background-color: #292b2c;
+    color: white;
+}
+.dark-modal .close {
+    color: white;
+}
+.light-blue-backdrop {
+    background-color: #5cb3fd;
+}

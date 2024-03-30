@@ -37,6 +37,7 @@ class userLogin(APIView):
                     'username': username,
                     'name': str(user.user_details.first_name).capitalize() + ' ' + str(user.user_details.last_name).capitalize(),
                     'user_type': user.user_details.user_type,
+                    'id': user.id,
                 }
                 return Response({'detail': 'Success', 'access_token': access_token, 'userdetails': user_details}, status=status.HTTP_200_OK)
             else:

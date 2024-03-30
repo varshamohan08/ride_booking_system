@@ -15,10 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-
 from django.conf import settings
-from django.urls import include, path
 
+from rides.consumers import RideConsumer
+from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.auth import AuthMiddlewareStack
+from django.core.asgi import get_asgi_application
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -28,15 +30,30 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('user_app.urls')),
     path('ride/', include('rides.urls')),
+    path('ws/rides', RideConsumer.as_asgi()),
 
+    
     # JWT Token URLs
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
 
+# WebSocket routing
+websocket_urlpatterns = [
+    path('ws/rides', RideConsumer.as_asgi()),
+]
+
+# Define the application protocol
+application = ProtocolTypeRouter({
+    "http": get_asgi_application(),
+    "websocket": AuthMiddlewareStack(URLRouter(websocket_urlpatterns)),
+})
+
+# Debug toolbar URL configuration
 if settings.DEBUG:
     import debug_toolbar
-    urlpatterns = [
+    urlpatterns.append(
         path('__debug__/', include(debug_toolbar.urls)),
         # Your other URL patterns go here
-    ]
+    )
+
