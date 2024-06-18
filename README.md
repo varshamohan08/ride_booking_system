@@ -1,5 +1,5 @@
 ## Ride Request System
-The Ride Request System is a web application that allows users to request rides and complete them for a fair. It consists of both frontend and backend components.
+The Ride Request System is a web application that allows users to request rides and complete them for a fair. It consists of both frontend and backend components. *(This repository contains the foundational structure for a Ride Booking System)*
 
 #### Features
 - User authentication: Users can sign up, log in, and manage their profiles.
